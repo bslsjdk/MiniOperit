@@ -75,6 +75,9 @@ val LightColors = lightColorScheme(
     error = Color(0xFFD64545)
 )
 
+// MainActivity 用的默认配色（深色）
+val AppColors = DarkColors
+
 val AppShapes = Shapes(
     extraSmall = RoundedCornerShape(8.dp),
     small = RoundedCornerShape(12.dp),
