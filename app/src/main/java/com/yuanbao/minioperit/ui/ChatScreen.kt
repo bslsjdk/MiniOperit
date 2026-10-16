@@ -439,9 +439,9 @@ private fun InputBar(
             // 发送 / 停止按钮
             Box(
                 Modifier.size(48.dp).clip(CircleShape)
-                    .background(
-                        if (busy) Color(0xFF3A2333)
-                        else Brush.linearGradient(listOf(BrandIndigo, BrandViolet))
+                    .then(
+                        if (busy) Modifier.background(Color(0xFF3A2333))
+                        else Modifier.background(Brush.linearGradient(listOf(BrandIndigo, BrandViolet)))
                     )
                     .clickable { if (busy) onStop() else if (value.isNotBlank()) onSend() },
                 contentAlignment = Alignment.Center
