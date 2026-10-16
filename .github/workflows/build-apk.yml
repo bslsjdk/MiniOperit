@@ -105,6 +105,15 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: 上传编译日志
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: gradle-build-log
+          path: gradle.log
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: 上传 APK
         uses: actions/upload-artifact@v4
         with:
