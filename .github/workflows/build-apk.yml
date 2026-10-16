@@ -29,14 +29,26 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: 设置 Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: 接受 SDK 许可
-        run: yes | sdkmanager --licenses >/dev/null 2>&1 || true
+      # GitHub 的 ubuntu-latest 镜像自带 Android SDK，不再依赖 setup-android
+      - name: 定位并准备 Android SDK
+        run: |
+          SDK="${ANDROID_HOME:-${ANDROID_SDK_ROOT:-/usr/local/lib/android/sdk}}"
+          echo "SDK=$SDK"
+          echo "ANDROID_SDK_ROOT=$SDK" >> $GITHUB_ENV
+          echo "ANDROID_HOME=$SDK" >> $GITHUB_ENV
+          ls "$SDK" || true
+          # 接受许可
+          for sm in "$SDK/cmdline-tools/latest/bin/sdkmanager" "$SDK/tools/bin/sdkmanager" "$SDK/cmdline-tools/bin/sdkmanager"; do
+            if [ -x "$sm" ]; then
+              yes | "$sm" --licenses >/dev/null 2>&1 || true
+              "$sm" "platforms;android-34" "build-tools;34.0.0" "platform-tools" >/dev/null 2>&1 || true
+              break
+            fi
+          done
+          echo "sdk.dir=$SDK" > local.properties
+          ls "$SDK/platforms" 2>/dev/null || true
 
       - name: 缓存 Gradle 发行版
-        id: gradle-cache
         uses: actions/cache@v4
         with:
           path: /opt/gradle-dist
@@ -52,9 +64,6 @@ jobs:
             sudo rm -f g.zip
           fi
           /opt/gradle-dist/gradle-8.7/bin/gradle --version | head -3
-
-      - name: 写入 local.properties
-        run: echo "sdk.dir=$ANDROID_SDK_ROOT" > local.properties
 
       - name: 编译 ${{ inputs.build_type || 'debug' }} APK
         run: |
