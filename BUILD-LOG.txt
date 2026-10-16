@@ -15,10 +15,10 @@ Daemon will be stopped at the end of the build
 > Task :app:parseDebugLocalResources
 > Task :app:processDebugMainManifest
 > Task :app:processDebugManifest
+> Task :app:processDebugManifestForPackage
 > Task :app:javaPreCompileDebug
 > Task :app:mergeDebugShaders
 > Task :app:compileDebugShaders NO-SOURCE
-> Task :app:processDebugManifestForPackage
 > Task :app:generateDebugAssets UP-TO-DATE
 > Task :app:mergeDebugAssets
 > Task :app:compressDebugAssets
@@ -52,5 +52,5 @@ w: file:///home/runner/work/MiniOperit/MiniOperit/app/src/main/java/com/yuanbao/
 > Task :app:createDebugApkListingFileRedirect
 > Task :app:assembleDebug
 
-BUILD SUCCESSFUL in 3m 17s
+BUILD SUCCESSFUL in 3m 20s
 38 actionable tasks: 38 executed
