@@ -33,14 +33,13 @@ Daemon will be stopped at the end of the build
 > Task :app:mergeDebugNativeLibs
 > Task :app:validateSigningDebug
 > Task :app:writeDebugAppMetadata
-> Task :app:writeDebugSigningConfigVersions
 
 > Task :app:stripDebugDebugSymbols
 Unable to strip the following libraries, packaging them as they are: libandroidx.graphics.path.so.
 
+> Task :app:writeDebugSigningConfigVersions
+
 > Task :app:compileDebugKotlin FAILED
-e: file:///home/runner/work/MiniOperit/MiniOperit/app/src/main/java/com/yuanbao/minioperit/MainActivity.kt:9:34 Unresolved reference 'AppColors'.
-e: file:///home/runner/work/MiniOperit/MiniOperit/app/src/main/java/com/yuanbao/minioperit/MainActivity.kt:25:23 Unresolved reference 'AppColors'.
 e: file:///home/runner/work/MiniOperit/MiniOperit/app/src/main/java/com/yuanbao/minioperit/ui/ChatScreen.kt:442:22 None of the following candidates is applicable:
 fun Modifier.background(brush: Brush, shape: Shape = ..., alpha: Float = ...): Modifier
 fun Modifier.background(color: Color, shape: Shape = ...): Modifier
@@ -252,5 +251,5 @@ Caused by: org.jetbrains.kotlin.gradle.tasks.CompilationErrorException: Compilat
 	... 2 more
 
 
-BUILD FAILED in 2m 44s
+BUILD FAILED in 2m 5s
 30 actionable tasks: 30 executed
