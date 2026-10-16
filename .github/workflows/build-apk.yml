@@ -66,13 +66,44 @@ jobs:
           /opt/gradle-dist/gradle-8.7/bin/gradle --version | head -3
 
       - name: 编译 ${{ inputs.build_type || 'debug' }} APK
+        id: gradle
+        continue-on-error: true
         run: |
           GRADLE=/opt/gradle-dist/gradle-8.7/bin/gradle
           if [ "${{ inputs.build_type || 'debug' }}" = "release" ]; then
-            $GRADLE :app:assembleRelease --no-daemon --stacktrace
+            $GRADLE :app:assembleRelease --no-daemon --stacktrace > gradle.log 2>&1 || true
           else
-            $GRADLE :app:assembleDebug --no-daemon --stacktrace
+            $GRADLE :app:assembleDebug --no-daemon --stacktrace > gradle.log 2>&1 || true
           fi
+          # 只保留错误相关行，控制体积
+          grep -nE '^e: |^w: |error:|FAILURE|What went wrong|\* Try|Caused by|Could not|Unresolved|Cannot|Exception' gradle.log | head -120 || true
+          echo "--- 日志尾部 ---"
+          tail -n 40 gradle.log
+
+      - name: 回传编译日志
+        if: always()
+        run: |
+          python3 - <<'PY'
+          import base64, json, os, urllib.request
+          tok = os.environ['GITHUB_TOKEN']; repo = os.environ['GITHUB_REPOSITORY']
+          if not os.path.exists('gradle.log'): raise SystemExit(0)
+          raw = open('gradle.log','rb').read()[-120000:]
+          payload = {'message':'ci: gradle build log','content':base64.b64encode(raw).decode(),'branch':'main'}
+          try:
+              g = urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/BUILD-LOG.txt')
+              g.add_header('Authorization','Bearer '+tok); g.add_header('User-Agent','b')
+              with urllib.request.urlopen(g, timeout=120) as gr: payload['sha']=json.load(gr).get('sha')
+          except Exception: pass
+          req = urllib.request.Request(f'https://api.github.com/repos/{repo}/contents/BUILD-LOG.txt', method='PUT')
+          req.add_header('Authorization','Bearer '+tok); req.add_header('Accept','application/vnd.github+json')
+          req.add_header('Content-Type','application/json'); req.add_header('User-Agent','b')
+          try:
+              with urllib.request.urlopen(req, json.dumps(payload).encode(), timeout=300) as r:
+                  print('log ok', r.status)
+          except Exception as e: print('log failed', repr(e)[:300])
+          PY
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: 上传 APK
         uses: actions/upload-artifact@v4
