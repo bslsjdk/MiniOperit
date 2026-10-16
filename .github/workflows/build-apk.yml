@@ -14,6 +14,10 @@ on:
           - debug
           - release
 
+permissions:
+  contents: write
+  actions: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
